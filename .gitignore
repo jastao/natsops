@@ -1,0 +1,5 @@
+# Omits IDE related file and directory
+.vscode/**
+
+# Omits Python virtual environment
+venv/**

@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  nats-publisher:
+    image: nats-pub:0.0.1
+    build: .
+    container_name: nats-publisher
+    restart: always
+    networks:
+      - ce_ce-network
+    command:
+      - "-s"
+      - "nats://nats-seed:4222" # <NATS server url>:<NATS client port>
+      - "data" # NATS subject
+
+networks:
+  # Custom user defined bridge network for the NATS server to communicate using domain name
+  # Reference to the external network created from the Nexus3 compose file.
+  ce_ce-network:
+    external: true

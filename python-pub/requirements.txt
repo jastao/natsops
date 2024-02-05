@@ -1,0 +1,2 @@
+asyncio==3.4.3
+nats_py==2.6.0

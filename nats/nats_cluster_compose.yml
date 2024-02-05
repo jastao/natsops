@@ -1,0 +1,101 @@
+version: '3.8'
+
+services:
+  nats-seed:
+    image: localhost:8082/repository/docker/nats:latest
+    container_name: nats-seed
+    restart: always
+    volumes:
+      - "./nats-shared-data:/nats-shared-data"
+    networks:
+      - ce_ce-network
+    ports:
+      # Port mapping for non container pub/sub from host system
+      - "14222:4222" # NATS client port
+      - "16222:6222" # routing port for cluster
+      - "18222:8222" # HTTP management port for information reporting
+    command:
+      - "--debug"
+      # Uncomment when want to externalize NATS logs to physical file.
+      #- "--log"
+      #- "/nats-shared-data/logs/nats-seed.log"
+      - "--cluster_name"
+      - "nats-cluster"
+      - "--cluster"
+      - "nats://0.0.0.0:6222"
+      - "--http_port"
+      - "8222"
+      - "--port"
+      - "4222"
+
+  nats-zone-b:
+    image: localhost:8082/repository/docker/nats:latest
+    container_name: nats-zone-b
+    restart: always
+    volumes:
+      - "./nats-shared-data:/nats-shared-data"
+    networks:
+      - ce_ce-network
+    depends_on:
+      - nats-seed
+    ports:
+      # Port mapping for non container pub/sub from host system
+      - "24222:4222"
+      - "26222:6222"
+      - "28222:8222"
+    command:
+      - "--debug"
+      # Uncomment when want to externalize NATS logs to physical file.
+      #- "--log"
+      #- "/nats-shared-data/logs/nats-b.log"
+      - "--cluster_name"
+      - "nats-cluster"
+      - "--cluster"
+      - "nats://0.0.0.0:6222"
+      - "--http_port"
+      - "8222"
+      - "--port"
+      - "4222"
+      - "--routes"
+      - "nats://nats-seed:6222"
+      
+  nats-zone-c:
+    image: localhost:8082/repository/docker/nats:latest
+    container_name: nats-zone-c
+    restart: always
+    volumes:
+      - "./nats-shared-data:/nats-shared-data"
+    networks:
+      - ce_ce-network
+    depends_on:
+      - nats-seed
+    ports:
+      # Port mapping for non container pub/sub from host system
+      - "34222:4222"
+      - "36222:6222"
+      - "38222:8222"
+    command:
+      - "--debug"
+      # Uncomment when want to externalize NATS logs to physical file.
+      #- "--log"
+      #- "/nats-shared-data/logs/nats-c.log"
+      - "--cluster_name"
+      - "nats-cluster"
+      - "--cluster"
+      - "nats://0.0.0.0:6222"
+      - "--http_port"
+      - "8222"
+      - "--port"
+      - "4222"
+      - "--routes"
+      - "nats://nats-seed:6222"
+
+networks:
+  # Custom user defined bridge network for the NATS server to communicate using domain name.
+  # Reference to the external network created from the Nexus3 compose file.
+  ce_ce-network:
+    external: true
+
+volumes:
+  # shared volume for NATS
+  nats-shared-data: {}

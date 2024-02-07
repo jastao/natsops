@@ -1,0 +1,2 @@
+# Omits any generated artifacts
+*.log

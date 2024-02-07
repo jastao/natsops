@@ -3,3 +3,9 @@
 
 # Omits Python virtual environment
 venv/**
+
+# Omits Nexus docker volume
+nexus_data/**
+
+# Omits NATS shared volume
+nats-shared-data/**

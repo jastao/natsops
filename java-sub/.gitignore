@@ -1,0 +1,6 @@
+# Ignore anything under the target folder
+target/**
+# Ignore any IDE specified folders
+.settings/**
+.classpath
+.project

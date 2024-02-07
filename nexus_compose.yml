@@ -19,7 +19,7 @@ services:
       - '80:80'
 
   nexus-deployment:
-    image: 'sonatype/nexus3:3.64.0'
+    image: sonatype/nexus3:3.64.0
     container_name: nexus3
     hostname: ce.nexus.io
     restart: always
@@ -27,10 +27,14 @@ services:
       - ce-network
     volumes:
       - "./nexus-data:/nexus-data"
+    expose:
+      - 8081
+      - 8082
+      - 8083
     ports:
       - "8081:8081"  # Port mapping for UI port
-      - "8082:8082"  # Port mapping for private registry
-      - "8083:8083"  # Port mapping for public Docker Hub
+      - "8082:8082"  # Port mapping for public Docker hub
+      - "8083:8083"  # Port mapping for private registry
 
 networks:
   # Custom user defined bridge network for the NATS server to communicate using domain name

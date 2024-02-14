@@ -31,6 +31,10 @@ services:
       - 8081
       - 8082
       - 8083
+    expose:
+      - 8081
+      - 8082
+      - 8083
     ports:
       - "8081:8081"  # Port mapping for UI port
       - "8082:8082"  # Port mapping for public Docker hub

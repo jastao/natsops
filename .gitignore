@@ -3,3 +3,6 @@
 
 # Omits Python virtual environment
 venv/**
+
+# Omits shared docker volume
+/volumes/**

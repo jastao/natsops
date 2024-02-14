@@ -2,24 +2,32 @@ version: '3.8'
 
 services:
   nats-subscriber-1:
-    image: nats-sub:0.0.1
-    build: .
+    image: ${NEXUS_PRIVATE_REGISTRY_URL}/nats-sub:0.0.1
+    build: 
+      context: .
+      args:
+        COMPOSE_DOCKER_CLI_BUILD: 1
+        DOCKER_BUILDKIT: 1
     container_name: nats-subscriber-1
     restart: always
     networks:
-      - ce_ce-network
+      - natsops_mspe-network
     command:
       - "-s"
       - "nats://nats-zone-b:4222" # <NATS server url>:<NATS client port>
       - "data" # NATS subject
 
   nats-subscriber-2:
-    image: nats-sub:0.0.1
-    build: .
+    image: ${NEXUS_PRIVATE_REGISTRY_URL}/nats-sub:0.0.1
+    build: 
+      context: .
+      args:
+        COMPOSE_DOCKER_CLI_BUILD: 1
+        DOCKER_BUILDKIT: 1
     container_name: nats-subscriber-2
     restart: always
     networks:
-      - ce_ce-network
+      - natsops_mspe-network
     command:
       - "-s"
       - "nats://nats-zone-c:4222" # <NATS server url>:<NATS client port>
@@ -28,5 +36,5 @@ services:
 networks:
   # Custom user defined bridge network for the NATS server to communicate using domain name
   # Reference to the external network created from the Nexus3 compose file.
-  ce_ce-network:
+  natsops_mspe-network:
     external: true

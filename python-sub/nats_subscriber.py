@@ -1,8 +1,19 @@
 import argparse
 import asyncio
+import logging
 import signal
 import nats
 import sys
+import time
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.FileHandler("sub.log"),
+        logging.StreamHandler()
+    ]
+)
 
 async def start_subscriber():
   """
@@ -15,8 +26,10 @@ async def start_subscriber():
   parser.add_argument('-q', '--queue', default="")
   args = parser.parse_args()
   
+  logging.info("Starting publisher...")
+  
   async def error_cb(e):
-    print("Error:", e)
+    logging.error("Error:", e)
 
   async def closed_cb():
       # Wait for tasks to stop otherwise get a warning.
@@ -24,18 +37,17 @@ async def start_subscriber():
       loop.stop()
 
   async def reconnected_cb():
-    print(f"Reconnected to NATS server: {args.servers}")
+    logging.info(f"Reconnected to NATS server: {args.servers}")
     
   async def subscribe_handler(message):
 
       subject = message.subject
-      reply   = message.reply
       data    = message.data.decode()
       
-      print(
-          "Received a message on '{subject} {reply}': {data}".format(
-              subject=subject, reply=reply, data=data
-          )
+      logging.info(
+          "".join(["[", str(time.perf_counter()), "]", " Received a message on '{subject}': {data}".format(
+              subject=subject, data=data
+          )])
       )
   options = {
       "error_cb": error_cb,
@@ -51,10 +63,10 @@ async def start_subscriber():
       
       nats_connection = await nats.connect(**options)
   except Exception as ex:
-    print(f"Failed to connect to the NATS server: {ex}")
+    logging.error(f"Failed to connect to the NATS server: {ex}")
     loop.close()
   
-  print(f"Listening on [{args.subject}]")
+  logging.info(f"Listening on [{args.subject}]")
   
   def raise_graceful_exit():
     loop.stop()

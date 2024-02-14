@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  nats-seed-exporter:
+    image: natsio/prometheus-nats-exporter:latest
+    container_name: nats-seed-exporter
+    restart: always
+    networks:
+      - natsops_mspe-network
+    ports:
+      - "7777:7777"
+    command:
+      - "-p"
+      - "7777"
+      - "-connz"
+      - "-healthz"
+      - "-gatewayz"
+      - "-routez"
+      - "-varz"
+      - "http://nats-seed:8222"
+  
+  nats-zone-b-exporter:
+    image: natsio/prometheus-nats-exporter:latest
+    container_name: nats-zone-b-exporter
+    restart: always
+    networks:
+      - natsops_mspe-network
+    ports:
+      - "7778:7778"
+    command:
+      - "-p"
+      - "7778"
+      - "-connz"
+      - "-healthz"
+      - "-gatewayz"
+      - "-routez"
+      - "-varz"
+      - "http://nats-zone-b:8222"
+  
+  nats-zone-c-exporter:
+    image: natsio/prometheus-nats-exporter:latest
+    container_name: nats-zone-c-exporter
+    restart: always
+    networks:
+      - natsops_mspe-network
+    ports:
+      - "7779:7779"
+    command:
+      - "-p"
+      - "7779"
+      - "-connz"
+      - "-healthz"
+      - "-gatewayz"
+      - "-routez"
+      - "-varz"
+      - "http://nats-zone-c:8222"
+
+networks:
+  # Custom user defined bridge network for the NATS server to communicate using domain name
+  # Reference to the external network created from the Nexus3 compose file.
+  natsops_mspe-network:
+    external: true

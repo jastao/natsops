@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: always
+    volumes:
+      - '../volumes/prometheus-data:/etc/prometheus'
+      - '../volumes/prometheus-data:/prometheus'
+    networks:
+      - natsops_mspe-network
+    ports:
+      - 9090:9090
+    command: 
+      - '--config.file=/etc/prometheus/prometheus.yml'
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: always
+    depends_on:
+      - prometheus
+    volumes:
+      - '../volumes/grafana-data:/var/lib/grafana'
+    networks:
+      - natsops_mspe-network
+    ports:
+      - 3000:3000
+    command:
+      - "--config=/etc/grafana/grafana.ini"
+      - "--homepath"
+      - "/usr/share/grafana"
+      - "cfg:default.paths.logs=/var/log/grafana"
+      - "cfg:default.paths.data=/var/lib/grafana"
+      - "cfg:default.paths.plugins=/var/lib/grafana/plugins"
+
+networks:
+  # Custom user defined bridge network for the NATS server to communicate using domain name.
+  # Reference to the external network created from the Nexus3 compose file.
+  natsops_mspe-network:
+    external: true

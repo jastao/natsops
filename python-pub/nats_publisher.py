@@ -1,7 +1,18 @@
 import argparse
 import asyncio
+import logging
 import nats
 import sys
+import time
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.FileHandler("pub.log"),
+        logging.StreamHandler()
+    ]
+)
 
 async def start_publisher():
   """
@@ -13,14 +24,16 @@ async def start_publisher():
   parser.add_argument('-s' '--servers', dest='servers', default="")
   args, unknown = parser.parse_known_args()
 
+  logging.info("Starting publisher...")
+
   if len(unknown) > 0:
     data = unknown[0]
 
   async def error_cb(e):
-    print("Error:", e)
+    logging.error("Error:", e)
 
   async def reconnected_cb():
-    print(f"Reconnected to NATS server: {args.servers}")
+    logging.info(f"Reconnected to NATS server: {args.servers}")
 
   options = {
     "error_cb": error_cb,
@@ -35,12 +48,12 @@ async def start_publisher():
       
     nats_connection = await nats.connect(**options)
   except Exception as ex:
-    print(f"Failed to connect to the NATS server: {ex}")
+    logging.error(f"Failed to connect to the NATS server: {ex}")
     sys.exit(1)
 
   for counter in range(1, 60):
-    message = "".join(("Current counter is ", str(counter)))
-    print(f"Published [{args.subject}] = {message}")
+    message = "".join(["[", str(time.perf_counter()), "]", " Current counter is ", str(counter)])
+    logging.info(f"Published [{args.subject}] = {message}")
     await nats_connection.publish(args.subject, message.encode())
     await asyncio.sleep(1)
   

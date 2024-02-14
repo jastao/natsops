@@ -2,13 +2,13 @@ version: '3.8'
 
 services:
   nats-seed:
-    image: localhost:8082/repository/docker/nats:latest
+    image: ${NEXUS_DOCKER_REGISTRY_URL}/nats:latest
     container_name: nats-seed
     restart: always
     volumes:
-      - "./nats-shared-data:/nats-shared-data"
+      - "../volumes/nats-shared-data:/nats-shared-data"
     networks:
-      - ce_ce-network
+      - natsops_mspe-network
     ports:
       # Port mapping for non container pub/sub from host system
       - "14222:4222" # NATS client port
@@ -29,13 +29,13 @@ services:
       - "4222"
 
   nats-zone-b:
-    image: localhost:8082/repository/docker/nats:latest
+    image: ${NEXUS_DOCKER_REGISTRY_URL}/nats:latest
     container_name: nats-zone-b
     restart: always
     volumes:
-      - "./nats-shared-data:/nats-shared-data"
+      - "../volumes/nats-shared-data:/nats-shared-data"
     networks:
-      - ce_ce-network
+      - natsops_mspe-network
     depends_on:
       - nats-seed
     ports:
@@ -60,13 +60,13 @@ services:
       - "nats://nats-seed:6222"
       
   nats-zone-c:
-    image: localhost:8082/repository/docker/nats:latest
+    image: ${NEXUS_DOCKER_REGISTRY_URL}/nats:latest
     container_name: nats-zone-c
     restart: always
     volumes:
-      - "./nats-shared-data:/nats-shared-data"
+      - "../volumes/nats-shared-data:/nats-shared-data"
     networks:
-      - ce_ce-network
+      - natsops_mspe-network
     depends_on:
       - nats-seed
     ports:
@@ -93,7 +93,7 @@ services:
 networks:
   # Custom user defined bridge network for the NATS server to communicate using domain name.
   # Reference to the external network created from the Nexus3 compose file.
-  ce_ce-network:
+  natsops_mspe-network:
     external: true
 
 volumes:

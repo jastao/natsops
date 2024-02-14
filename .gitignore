@@ -5,4 +5,4 @@
 venv/**
 
 # Omits shared docker volume
-/volumes/**
+#/volumes/**

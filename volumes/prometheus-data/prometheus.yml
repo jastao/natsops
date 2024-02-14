@@ -1,0 +1,22 @@
+# my global config
+global:
+  scrape_interval:     5s # Set the scrape interval to every 5 seconds. Default is every 1 minute.
+  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+  # scrape_timeout is set to the global default (10s).
+
+  # Attach these labels to any time series/alerts when communciating with any external entities
+  external_labels:
+    monitor: 'NATS Servers'
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: 'NATS-servers'
+
+    # Set the scraping target URLs of all NATS servers.
+    # This tells prometheus where to scrape metrics from.
+    # Since the target is not running inside the prometheus container, need to reference
+    # host.docker.internal for localhost.
+    static_configs:
+      - targets: ['host.docker.internal:7777', 'host.docker.internal:7778', 'host.docker.internal:7779']
